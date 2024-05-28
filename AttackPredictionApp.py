@@ -2,11 +2,13 @@ import tkinter as tk
 from tkinter import filedialog, messagebox
 import pandas as pd
 import random
+from rf_wrapper import *
 
-class AttackDetectionApp:
+class AttackPredictionApp:
     def __init__(self, root):
         self.root = root
-        self.root.title("Attack Prediction Application")
+        self.root.title("ATTACK PREDICTION APPLICATION FOR DATASET")
+        self.full_screen = False
 
         self.data = None
         self.predictions = None
@@ -14,14 +16,47 @@ class AttackDetectionApp:
         self.create_widgets()
 
     def create_widgets(self):
-        self.load_button = tk.Button(self.root, text="Load Dataset", command=self.load_dataset)
-        self.load_button.pack()
+        # Create a frame for the top buttons
+        top_frame = tk.Frame(self.root)
+        top_frame.pack(fill=tk.X)
 
-        self.predict_button = tk.Button(self.root, text="Predict Attacks", command=self.predict_attacks)
-        self.predict_button.pack()
+        # Load dataset button
+        self.load_button = tk.Button(top_frame, text="Load Dataset", command=self.load_dataset)
+        self.load_button.pack(side=tk.LEFT, padx=5, pady=5)
 
-        self.table = tk.Text(self.root, wrap="none")
-        self.table.pack()
+        # Next dataset button
+        self.next_button = tk.Button(top_frame, text="Next Dataset", command=self.load_dataset)
+        self.next_button.pack(side=tk.LEFT, padx=5, pady=5)
+
+        # Predict attacks button
+        self.predict_button = tk.Button(top_frame, text="Predict Attacks", command=self.predict_attacks)
+        self.predict_button.pack(side=tk.LEFT, padx=5, pady=5)
+        
+        # Full screen toggle button
+        self.full_screen_button = tk.Button(top_frame, text="Full Screen", command=self.toggle_full_screen)
+        self.full_screen_button.pack(side=tk.LEFT, padx=5, pady=5)
+
+        # Create a frame for the table and scrollbars
+        table_frame = tk.Frame(self.root)
+        table_frame.pack(fill=tk.BOTH, expand=True)
+
+        # Create the table (Text widget) and scrollbars
+        self.table = tk.Text(table_frame, wrap="none")
+        self.table.pack(side=tk.LEFT, fill=tk.BOTH, expand=True)
+
+        self.v_scrollbar = tk.Scrollbar(table_frame, orient=tk.VERTICAL, command=self.table.yview)
+        self.v_scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        
+        self.h_scrollbar = tk.Scrollbar(table_frame, orient=tk.HORIZONTAL, command=self.table.xview)
+        self.h_scrollbar.pack(side=tk.BOTTOM, fill=tk.X)
+        
+        self.table.config(yscrollcommand=self.v_scrollbar.set, xscrollcommand=self.h_scrollbar.set)
+
+    def toggle_full_screen(self):
+        self.full_screen = not self.full_screen
+        self.root.attributes("-fullscreen", self.full_screen)
+        if not self.full_screen:
+            self.root.geometry("800x600")  # Reset to default size when exiting full screen
 
     def load_dataset(self):
         file_path = filedialog.askopenfilename(filetypes=[("CSV files", "*.csv")])
@@ -59,5 +94,5 @@ class AttackDetectionApp:
 
 if __name__ == "__main__":
     root = tk.Tk()
-    app = AttackDetectionApp(root)
+    app = AttackPredictionApp(root)
     root.mainloop()
